@@ -2,7 +2,7 @@
 ## Description
 - Electronでjuliusを使ってみるサンプルを、自分で遊ぶ用にカスタマイズしたやつ。
   - 音声認識エンジン julius の GMM と DNN の比較と Electron からの操作方法 http://motok5.hatenablog.com/entry/2018/09/22/083226
-  - @motok5 / voice-recognition-app-sample https://github.com/myonyomu/voice-recognition-app-sample
+  - @motok5 / voice-recognition-app-sample https://github.com/motok5/voice-recognition-app-sample
 - 音声認識に必要なjuliusは、git clone後に各自で配置をお願いします。
   - https://julius.osdn.jp/index.php?q=dictation-kit.html
 
@@ -24,3 +24,44 @@
 
 ## etc
 - Electronのパッケージ化は試してません。そもjuliusの使用規約として大丈夫か確かめてないのでやりません。
+- GMMが不可能な環境の場合、使用するロジックをDNNに切り替えてみてください。
+
+src/main.js
+```
+const amdnnConfPath = require.resolve('../libs/dictation-kit/am-dnn.jconf');
+const dnnConfPath = require.resolve('../libs/dictation-kit/julius.dnnconf');
+```
+
+↓
+
+```
+const amgmmConfPath = require.resolve('../libs/dictation-kit/am-gmm.jconf');
+const gmmConfPath = require.resolve('../libs/dictation-kit/julius.gmmconf');
+```
+
+src/main.js
+```
+  juliusProcess = proc.spawn(exePath, [
+    '-C', mainConfPath,
+    '-C', amdnnConfPath,
+    '-demo',
+    '-dnnconf', dnnConfPath,
+    '-module'
+  ], {
+    detached: true
+  });
+```
+
+↓
+
+```
+  juliusProcess = proc.spawn(exePath, [
+    '-C', mainConfPath,
+    '-C', amgmmConfPath,
+    '-demo',
+    '-gmmconf', gmmConfPath,
+    '-module'
+  ], {
+    detached: true
+  });
+```
