@@ -1,42 +1,52 @@
-var net = require('net');
-
-window.addEventListener('DOMContentLoaded', onLoad);
-
-let juliusServerProc = null;
 let juliusClient = null;
 let juliusResultBuffer = "";
 
-function onLoad() {
-  document.querySelector('#start-btn').addEventListener('click', (event) => {
-    event.target.disabled = true;
-    document.getElementById('end-btn').disabled = false;
-    document.getElementById('status').innerText = "スタンバイ";
-    startRecognition();
-  });
-  document.querySelector('#end-btn').addEventListener('click', (event) => {
-    event.target.disabled = true;
-    document.getElementById('start-btn').disabled = false;
-    document.getElementById('status').innerText = "停止中";
-    endRecognition();
-  });
+const commentStack = [];
+let commentWait = 0;
+let tickEventId = '';
+
+window.addEventListener('DOMContentLoaded', onLoad);
+
+const logger = {
+  log(text) {
+    if (window.appConfig.log) {
+      const logSpaceEl = document.getElementById('logger-text');
+      logSpaceEl.innerText = text;
+    } else {
+      console.log(text);
+    }
+  }
 };
 
-function startRecognition() {
-  if (juliusServerProc) {
-   return;
-  }
+function onLoad() {
+  setLogger();
+  startRecognition();
+};
 
-  var spawn = require('child_process').spawn;
-  juliusServerProc = spawn('./julius-server.sh', {detached: true});
+function setLogger() {
+  if(!window.appConfig.log) {
+    $('.logger').remove();
+  }
+}
+
+function startRecognition() {
+  const { net } = window.libs;
+  tickEventId = window.setInterval(() => {
+    commentWait -= 200;
+    if (0 < commentStack.length && commentWait <= 0) {
+      const comment = commentStack.pop();
+      commentWait = comment.length * 200;
+      updateComment(comment);
+      //speach(comment);
+    }
+  }, 200);
 
   setTimeout(function() {
     juliusClient = net.createConnection(10500, 'localhost', function() {
-      console.log('connected.');
+      $('#loader').fadeOut(300);
+      logger.log('Fukidashi ready');
     });
-    setTimeout(function() {
-      document.getElementById('status').innerText = "起動中";
-    }, 7000)
-    
+
     juliusClient.on('data', function(data) {
       juliusResultBuffer = juliusResultBuffer + data.toString();
       if (/[\s\S]\.[\s\S]$/.test(data.toString())) {
@@ -47,27 +57,44 @@ function startRecognition() {
           while ((match = regexp.exec(juliusResultBuffer))!== null) {
             recogwords.push(match[1]);
           }
-          addComment(recogwords.join(""))
+          stackComment(recogwords.join(""))
         }
         juliusResultBuffer = "";
       }
     });
     
     juliusClient.on('end', function() {
-      console.log('disconnected.');
+      logger.log('disconnected.');
     });
   }, 3000);
 }
 
-function endRecognition() {
-  console.log('julius server is killed.');
-  process.kill(-juliusServerProc.pid);
-  juliusServerProc = null;
+function stackComment(comment) {
+  const isPunctuationOnly = /^[、。]$/g.test(comment);
+  if (isPunctuationOnly) {
+    return;
+  }
+
+  commentStack.push(comment);
 }
 
-function addComment(comment) {
-  var ul = document.getElementById("comment-list");
-  var li = document.createElement("li");
-  li.appendChild(document.createTextNode(comment));
-  ul.appendChild(li);
+function updateComment(comment) {
+  const { $ } = window.libs;
+  const $message = $('#message');
+
+  $message.fadeOut(150);
+  window.setTimeout(() => {
+    $message.text(comment);
+    $message.fadeIn(150);
+  }, 200);
+}
+
+function speach(comment) {
+  var msg = new SpeechSynthesisUtterance();
+  msg.volume = 0.65;
+  msg.rate = 0.45;
+  msg.pitch = 0.95;
+  msg.text = comment;
+  msg.lang = 'ja-JP';
+  window.speechSynthesis.speak(msg);
 }

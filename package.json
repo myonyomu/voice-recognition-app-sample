@@ -1,14 +1,17 @@
 {
-  "name": "voice-recognition-app-sample",
+  "name": "fukidashi",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "electron ./src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "electron": "^2.0.9"
+  "license": "NOLICENSE",
+  "devDependencies": {},
+  "dependencies": {
+    "electron": "^7.1.11",
+    "jquery": "^3.4.1"
   }
 }

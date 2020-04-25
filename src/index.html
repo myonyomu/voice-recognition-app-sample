@@ -1,18 +1,33 @@
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Voice Recognition App</title>
-    <script src="voice-recognition-app.js"></script>
-  </head>
- 
-  <body>
-    <div>
-      <button id="start-btn">start</button>
-      <button id="end-btn" disabled>end</button>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Recognition App</title>
+  <link href="main.css" rel="stylesheet">
+  <script src="voice-recognition-app.js"></script>
+</head>
+
+<body>
+  <div class="container-fluid is-direction-column">
+    <div class="balloon">
+      <div id="loader" class="loader">
+        <div class="lds-ring">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <div>
+          <p>Loading...</p>
+        </div>
+      </div>
+      <p id="message" class="message-wrapper as-typing-text"></p>
     </div>
-    <div id="status">
+    <div class="logger">
+      <p id="logger-text" class="logger-text">log window</p>
     </div>
-    <ul id="comment-list">
-    </ul>
-  </body>
+    </div>
+  </div>
+</body>
+
 </html>
