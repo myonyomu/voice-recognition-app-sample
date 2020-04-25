@@ -10,9 +10,11 @@
 - Node.js
   - 13系。試してませんが10系以降なら大丈夫だと思います。
 - Electron
+- julius dictation kit
+  - 4.5で起動確認。
 
 ## Usage
-- juliusのzipをダウンロードし、解凍したフォルダの中身を/libs/dictation-kitというフォルダを作成して突っ込む。
+- julius dictation kitのzipをダウンロードし、解凍したフォルダの中身を/libs/dictation-kitというフォルダを作成して突っ込む。
   - https://julius.osdn.jp/index.php?q=dictation-kit.html
   - 公開ページにあるように、git-lfsを利用してじゃないと音声モデルキットが落とせないかもしれません。
 
@@ -24,7 +26,7 @@
 
 ## etc
 - Electronのパッケージ化は試してません。そもjuliusの使用規約として大丈夫か確かめてないのでやりません。
-- GMMが不可能な環境の場合、使用するロジックをDNNに切り替えてみてください。
+- DNNが不可能な環境の場合、使用するロジックをGMMに切り替えてみてください。
 
 src/main.js
 ```
